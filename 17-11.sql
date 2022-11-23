@@ -71,6 +71,3 @@ SELECT
 FROM Employee e1 
 LEFT JOIN Employee e2 
 ON e1.ReportsTo = e2.EmployeeId 
-
-
-
