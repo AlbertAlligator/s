@@ -59,23 +59,16 @@ SELECT Total  FROM Invoice WHERE BillingCountry  = 'Czech Republic'
 
 SELECT COUNT(DISTINCT(FirstName)) FROM Customer c
 
-
-
 SELECT FirstName, COUNT(*)  FROM Customer GROUP BY FirstName 
 HAVING COUNT(*) > 1
 
-
-
 SELECT * FROM Customer WHERE FirstName in ('Frank', 'Mark')
-
-
 
 select count(*), GenreId  from Track group by GenreId;
 
 select max(total), CustomerId from Invoice group by CustomerId
 
 select sum(Total) , CustomerId  from Invoice i group by CustomerId
-
 
 SELECT GenreId as id, Name  FROM Genre
 UNION
@@ -90,7 +83,7 @@ SELECT COUNT(TrackId) FROM PlaylistTrack
 
 
 BOOKS 
-| id | title       | author     | url 						| 
+| id | title       | author     | url 						 | 
 | 1  | 3 мушкетера | А.Дюма 	| https://storage.ru/books/1 | 
 
 
@@ -168,3 +161,106 @@ FROM Employee e1
 LEFT JOIN Employee e2 
 ON e1.ReportsTo = e2.EmployeeId 
 
+
+SELECT * FROM "user" 
+
+-- получить дату
+SELECT now()
+
+-- Добавить пользователя
+INSERT INTO "user" (login, "password", display_name) VALUES ('test_login', 'test_pass', 'test_dn')
+
+-- Создаем процедуру добавления пользователя (логин, пароль)
+CREATE OR REPLACE procedure add_user(
+	username varchar(20), 
+	pass varchar(100)
+) LANGUAGE SQL
+AS $$
+	INSERT INTO public."user" (login, "password", display_name)
+	VALUES ($1, $2, $1)
+$$;
+
+-- Создаем процедуру добавления пользователя (логин, пароль, отображаемое имя)
+CREATE OR REPLACE procedure add_user(
+	username varchar(20), 
+	pass varchar(100),
+	display_name varchar(40)
+) LANGUAGE SQL
+AS $$
+	INSERT INTO public."user" (login, "password", display_name)
+	VALUES ($1, $2, $3)
+$$;
+
+-- примеры использования
+CALL add_user('tester', 'testpass') 
+
+CALL add_user('myLogin', 'myPass', 'myDispName') 
+
+-- Задача: реализовать механизм добавления сотрудника только с Id компании
+-- Если такой компании нет, создать ее
+
+CREATE UNIQUE INDEX comp_name_idx ON public.company (comp_name)
+
+CREATE OR REPLACE procedure add_emp(first_name varchar(20), last_name varchar(20), phone varchar(15), company_name varchar(100)) 
+LANGUAGE plpgsql AS 
+$$
+	declare 
+		compId int;
+	begin 
+		INSERT INTO company (comp_name) VALUES ($4)
+		ON CONFLICT (comp_name) DO nothing;
+	
+		SELECT id from company where comp_name = $4 INTO compId;
+	
+		INSERT INTO employee (first_name, last_name, phone, "companyId")
+		VALUES ($1, $2, $3, compId);
+	
+		CALL add_user($1, $4);
+	end	
+$$;
+
+CALL add_emp('Nat', 'Romanov', '+46473458765', 'Avengers') 
+
+CALL add_emp('Tony', 'Stark', '+4985123443', 'Avengers') 
+
+CALL add_emp('Chris', 'Rogers', '+4985125678', 'Avengers') 
+
+SELECT * FROM employee e 
+
+SELECT * FROM "user" u 
+
+SELECT * FROM company c 
+
+
+
+-- Задача ставить поле isActive = false при попытке удаления пользователя
+select * from "user" u 
+
+UPDATE "user" 
+SET "isActive" = false 
+where id = 34
+
+CREATE TRIGGER dlt_usr_trg 
+BEFORE DELETE ON public."user"
+FOR EACH ROW
+EXECUTE PROCEDURE dlt_usr();
+
+CREATE OR REPLACE FUNCTION dlt_usr()
+  RETURNS trigger AS '
+	BEGIN
+  		UPDATE public."user" SET "isActive"=false WHERE id=OLD.id;
+  		RETURN NULL;
+	END; ' 
+language plpgsql;
+
+SELECT * FROM "user"
+
+DELETE FROM "user" WHERE id = 41
+
+UPDATE "user" SET "isActive" = true
+
+			
+call add_user('test', 'test')
+
+
+SELECT * FROM "user"
