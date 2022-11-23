@@ -1,3 +1,74 @@
+-- Получить 1 колонку
+SELECT CustomerId FROM Customer;
+
+-- Получить конкретные колонки
+SELECT FirstName, LastName, Email FROM Customer;
+
+-- Вывести все колонки
+SELECT * FROM Customer;
+
+-- Вывести только те строки, где имя Марк
+SELECT * FROM Customer WHERE FirstName = 'Mark';
+
+-- Где компания не пустая Мар
+SELECT * FROM Customer WHERE Company IS NOT NULL
+
+-- Где ИД клиента не равен 50
+SELECT * FROM Customer WHERE CustomerId != 50
+
+-- Вывести клиентов. Сортировка по имени
+SELECT * FROM Customer ORDER BY FirstName  
+
+-- Сортировка по колонке Total. От большего к меньшему
+SELECT * FROM Invoice ORDER BY Total DESC
+
+-- Вывести две колонки из таблицы Invoice,
+-- Где ИД клиента 7
+-- Сортировка по колонке Total. От большего к меньшему
+SELECT InvoiceId, Total FROM Invoice 
+WHERE CustomerId = 7
+ORDER BY Total DESC;
+
+-- Вывести клиентов из города Прага ИЛИ Вена ИЛИ Сан-Пауло
+SELECT * FROM Customer 
+WHERE City  IN ("Prague","Vienne","São Paulo")
+
+-- Вывести клиентов, где ИД от 10 до 15
+SELECT * FROM Customer
+WHERE CustomerId BETWEEN 10 AND 15
+
+-- Вывести клиентов из Канады ИЛИ Бразилии
+SELECT * FROM Customer
+WHERE Country  = 'Canada' 
+OR Country  = 'Brazil' 
+
+-- Вывести клиентов из Канады И(!) штата ON
+SELECT * FROM Customer
+WHERE Country  = 'Canada' 
+AND State  = 'ON' 
+
+-- Вывести клиентов, где ИД = 7 или 10 или 12
+SELECT * FROM Customer 
+WHERE CustomerId in (7,10,12)
+
+-- Тот же результат
+SELECT * FROM Customer
+WHERE CustomerId BETWEEN 7 AND 10
+OR CustomerId BETWEEN 12 AND 15
+OR CustomerId BETWEEN 17 AND 19;
+
+-- Посчитать
+SELECT COUNT(*) FROM Invoice
+-- Максимальное
+SELECT MAX(Total) FROM Invoice
+-- Минимальное
+SELECT MIN(Total) FROM Invoice 
+-- Сумма 
+SELECT SUM(Total) FROM Invoice 
+-- Среднее
+SELECT AVG(Total) FROM Invoice
+
+
 -- Список уникальных стран
 SELECT DISTINCT(Country) FROM Customer
 
